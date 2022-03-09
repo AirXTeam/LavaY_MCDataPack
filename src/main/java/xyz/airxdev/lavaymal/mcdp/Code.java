@@ -3,11 +3,15 @@ package xyz.airxdev.lavaymal.mcdp;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
+import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
+import static java.nio.file.StandardCopyOption.*;
 import java.util.logging.Logger;
 
 public class Code {
@@ -104,22 +108,207 @@ public class Code {
                 Log.info("Write 'pack.png' Finish !");
                 Log.info("Write Head Files Finish !");
             }
-            Log.info("Loading Resources Part !");
+            //Log.info("Loading Resources Part !");
             M3 = (Map) MP.get("Resources");
             if(M3 == null){
                 Log.info("Resources Part Not Found ! Skip !");
             }else{
-                Log.info("Loading Resources Part......");
+                Log.info("Preparing Load Resources Part......");
                 L1 = new ArrayList<>();
                 L1 = (List) M3.get("DataList");
                 M5 = (Map) M3.get("Data");
                 if(L1 != null){
+                    Log.info("Loading Resources Part......");
                     for (int i = 0; i < L1.size(); i++) {
                         String TName = (String) L1.get(i);
                         Map TM;
                         TM = (Map) M5.get(TName);
+                        if(TM == null){
+                            Log.warning("Error : Part 'Data' Not Found !");
+                            return false;
+                        }
+                        String TP = (String) TM.get("Type");
+                        if(TP != null){
+                            switch (TP){
+                                case "File":
+                                    String InP1 = (String) TM.get("In");
+                                    String OutP1 = (String) TM.get("Out");
+                                    FileChannel IC1 = null;
+                                    FileChannel OC1 = null;
+                                    File TIF1 = new File(InP1);
+                                    if(!TIF1.exists()){
+                                        Log.warning("File Error : Input File is not exists In Resources '" + TName + "' !");
+                                        return false;
+                                    }
+                                    File TOF1 = new File(this.D_OutPut + "/" + OutP1);
+                                    TOF1.mkdirs();
+                                    TOF1.delete();
+                                    TOF1.createNewFile();
+                                    try {
+                                        try {
+                                            IC1 = new FileInputStream(new File(InP1)).getChannel();
+                                            OC1 = new FileOutputStream(TOF1).getChannel();
+                                            OC1.transferFrom(IC1, 0, IC1.size());
+                                        } finally {
+                                            //IC1.close();
+                                            //OC1.close();
+                                            if(IC1 != null){
+                                                IC1.close();
+                                            }
+                                            if(OC1 != null){
+                                                OC1.close();
+                                            }
+                                        }
+                                    }catch (IOException ex){
+                                        Log.warning("File Error : Copy File Failed In Resources '" + TName + "' !");
+                                        ex.printStackTrace();
+                                        return false;
+                                    }
+                                    break;
+                                    //单个文件
+                                case "Dir":
+                                    String InP2 = (String) TM.get("In");
+                                    String OutP2 = (String) TM.get("Out");
+                                    //FileChannel IC2 = null;
+                                    //FileChannel OC2 = null;
+                                    File TIF2 = new File(InP2);
+                                    if(!TIF2.exists()){
+                                        Log.warning("File Error : Input File is not exists In Resources '" + TName + "' !");
+                                        return false;
+                                    }
+                                    File TOF2 = new File(this.D_OutPut + "/" + OutP2);
+                                    TOF2.mkdirs();
+                                    TOF2.delete();
+                                    TOF2.createNewFile();
+                                    try {
+                                        /*try {*/
+                                            //IC2 = new FileInputStream(new File(InP2)).getChannel();
+                                            //OC2 = new FileOutputStream(TOF2).getChannel();
+                                            //OC2.transferFrom(IC2, 0, IC2.size());
+                                        CopyFolder(new File(InP2),new File(OutP2));
+                                        /*} finally {
+                                            IC2.close();
+                                            OC2.close();
+                                        }*/
+                                    }catch (IOException ex){
+                                        Log.warning("File Error : Copy File Failed In Resources '" + TName + "' !");
+                                        ex.printStackTrace();
+                                        return false;
+                                    }
+                                    break;
+                                case "FileList":
+                                    List Tp1,Tp2;
+                                    Tp1 = (List) TM.get("InList");
+                                    Tp2 = (List) TM.get("OutList");
+                                    //String InP3 = (String) TM.get("InList");
+                                    //String OutP3 = (String) TM.get("OutList");
+                                    FileChannel IC3 = null;
+                                    FileChannel OC3 = null;
+                                    if(Tp1.size() != Tp2.size()){
+                                        Log.warning("Error : Parameter mismatch In Resources '" + TName + "' !");
+                                        return false;
+                                    }
+                                    for (int j = 0; j < Tp1.size(); j++) {
+                                        File TIF3 = new File((String) Tp1.get(j));
+                                        if(!TIF3.exists()){
+                                            Log.warning("File Error : Input File is not exists In Resources '" + TName + "' !");
+                                            return false;
+                                        }
+                                        File TOF3 = new File(this.D_OutPut + "/" + (String) Tp2.get(j));
+                                        TOF3.mkdirs();
+                                        TOF3.delete();
+                                        TOF3.createNewFile();
+                                        try {
+                                            try {
+                                                IC1 = new FileInputStream(new File((String) Tp1.get(j))).getChannel();
+                                                OC1 = new FileOutputStream(TOF3).getChannel();
+                                                OC1.transferFrom(IC1, 0, IC1.size());
+                                            } finally {
+                                                if(IC3 != null){
+                                                    IC3.close();
+                                                }
+                                                if(OC3 != null){
+                                                    OC3.close();
+                                                }
 
+                                            }
+                                        }catch (IOException ex){
+                                            Log.warning("File Error : Copy File Failed In Resources '" + TName + "' !");
+                                            ex.printStackTrace();
+                                            return false;
+                                        }
+                                    }
+                                    break;
+                                    //多个文件
+                                case "DirList":
+                                    List Tp3,Tp4;
+                                    Tp3 = (List) TM.get("InList");
+                                    Tp4 = (List) TM.get("OutList");
+                                    //String InP3 = (String) TM.get("InList");
+                                    //String OutP3 = (String) TM.get("OutList");
+                                    FileChannel IC4 = null;
+                                    FileChannel OC4 = null;
+                                    if(Tp3.size() != Tp4.size()){
+                                        Log.warning("Error : Parameter mismatch In Resources '" + TName + "' !");
+                                        return false;
+                                    }
+                                    for (int j = 0; j < Tp3.size(); j++) {
+                                        File TIF3 = new File((String) Tp3.get(j));
+                                        if(!TIF3.exists()){
+                                            Log.warning("File Error : Input File is not exists In Resources '" + TName + "' !");
+                                            return false;
+                                        }
+                                        File TOF4 = new File(this.D_OutPut + "/" + (String) Tp4.get(j));
+                                        TOF4.mkdirs();
+                                        //TOF3.delete();
+                                        //TOF3.createNewFile();
+                                        try {
+                                            /*try {
+                                                IC1 = new FileInputStream(new File((String) Tp3.get(j))).getChannel();
+                                                OC1 = new FileOutputStream(TOF3).getChannel();
+                                                OC1.transferFrom(IC1, 0, IC1.size());
+                                            } finally {
+                                                IC4.close();
+                                                OC4.close();
+                                            }*/
+                                            CopyFolder(new File((String) Tp3.get(j)),new File( (String) Tp4.get(j)));
+                                        }catch (IOException ex){
+                                            Log.warning("File Error : Copy File Failed In Resources '" + TName + "' !");
+                                            ex.printStackTrace();
+                                            return false;
+                                        }
+                                    }
+                                    break;
+                                default:
+                                    Log.warning("Error : Invalid Resources Type In '" + TName + "' !");
+                                    return false;
+                            }
+                            /*if(TP != "FileList" | TP != "DirList"){
+                                String InP = (String) TM.get("In");
+                                String OutP = (String) TM.get("Out");
+                                if(TP == "File"){
+                                    FileChannel inputChannel = null;
+                                    FileChannel outputChannel = null;
+                                }
+                                if(TP == "Dir"){
+
+                                }
+                            }else{
+                                if(TP == "FileList"){
+
+                                }
+                                if(TP == "DirList"){
+
+                                }
+                            }*/
+                        }else{
+                            Log.warning("Error : Can't Find Resources Type In '" + TName + "' !");
+                            return false;
+                        }
                     }
+                }else{
+                    Log.warning("Error : Can't Find Resources List !");
+                    return false;
                 }
             }
 
@@ -130,6 +319,40 @@ public class Code {
             Log.warning("System Error : ");
             e.printStackTrace();
             return false;
+        }
+    }
+
+    private static void CopyFolder(File sourceFolder, File destinationFolder) throws IOException
+    {
+        //Check if sourceFolder is a directory or file
+        //If sourceFolder is file; then copy the file directly to new location
+        if (sourceFolder.isDirectory())
+        {
+            //Verify if destinationFolder is already present; If not then create it
+            if (!destinationFolder.exists())
+            {
+                destinationFolder.mkdir();
+                //System.out.println("Directory created :: " + destinationFolder);
+            }
+
+            //Get all files from source directory
+            String files[] = sourceFolder.list();
+
+            //Iterate over all files and copy them to destinationFolder one by one
+            for (String file : files)
+            {
+                File srcFile = new File(sourceFolder, file);
+                File destFile = new File(destinationFolder, file);
+
+                //递归调用复制子目录
+                CopyFolder(srcFile, destFile);
+            }
+        }
+        else
+        {
+            //使用文件复制工具进行复制
+            Files.copy(sourceFolder.toPath(), destinationFolder.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            //System.out.println("File copied :: " + destinationFolder);
         }
     }
 
