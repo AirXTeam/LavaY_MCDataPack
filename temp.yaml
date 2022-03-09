@@ -1,0 +1,14 @@
+Namespace : "testdatapack"
+Package:
+  Icon: "icon.png"
+  Name: "%5Test"
+  Version: "9"
+Build:
+  SubData: "false"
+Resources:
+  FileList: ["t1.txt","t2.txt"]
+
+
+Test:
+  T2: ["as",
+  "bs"]
