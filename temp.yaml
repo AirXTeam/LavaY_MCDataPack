@@ -6,7 +6,7 @@ Package:
 Build:
   SubData: "false"
 Resources:
-  DataList: ["t1","t2"]
+  DataList: ["t1","t2","t3"]
   Data:
     t1:
       Type: "File"
@@ -16,6 +16,14 @@ Resources:
       Type: "File"
       In: "pom.xml"
       Out: "data/c/pom666222.txt"
+    t5555:
+      Type: "File"
+      In: "pom.xml"
+      Out: "data/c/pom666222.txt"
+    t3:
+      Type: "FileList"
+      InList: ["pom.xml","pom.xml"]
+      OutList: ["data/c/pom666222.txt","data2/pom666222.txt"]
 
 
 Test:

@@ -204,6 +204,10 @@ public class Code {
                                     //String OutP3 = (String) TM.get("OutList");
                                     FileChannel IC3 = null;
                                     FileChannel OC3 = null;
+                                    if(Tp1 == null | Tp2 == null){
+                                        Log.warning("Error : InList or OutList Not Found In Resources '" + TName + "' !");
+                                        return false;
+                                    }
                                     if(Tp1.size() != Tp2.size()){
                                         Log.warning("Error : Parameter mismatch In Resources '" + TName + "' !");
                                         return false;
@@ -248,6 +252,10 @@ public class Code {
                                     //String OutP3 = (String) TM.get("OutList");
                                     FileChannel IC4 = null;
                                     FileChannel OC4 = null;
+                                    if(Tp3 == null | Tp4 == null){
+                                        Log.warning("Error : InList or OutList Not Found In Resources '" + TName + "' !");
+                                        return false;
+                                    }
                                     if(Tp3.size() != Tp4.size()){
                                         Log.warning("Error : Parameter mismatch In Resources '" + TName + "' !");
                                         return false;
