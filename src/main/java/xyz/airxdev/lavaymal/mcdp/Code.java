@@ -27,6 +27,7 @@ public class Code {
     public byte[] D_IconD ;
     public String D_Name = "";
     public String D_Version = "0";
+    public boolean A_ImportFromOther = false;
     public void Init(String RunDir,String MainFP){
         this.RunDir = RunDir;
         this.MainFP = MainFP;
@@ -55,17 +56,73 @@ public class Code {
             }
             Map MP = (Map)OB;//转换到Map类型
             String NameSpace = (String) MP.get("Namespace");
+            if(NameSpace == null){
+                NameSpace = (String) MP.get("NS");
+                if(NameSpace == null){
+                    Log.warning("NameSpace Error : NameSpace was Nof Found !");
+                    return false;
+                }
+            }
             Log.info("NameSpace : " + NameSpace);
             M1 = (Map) MP.get("Package");
             M2 = (Map) MP.get("Build");
             this.D_SubData = (String) M2.get("SubData");
             if(this.D_SubData == null){
-                this.D_SubData = "false";
+                if(this.A_ImportFromOther){
+                    this.D_SubData = "true";
+                }else{
+                    this.D_SubData = "false";
+                }
+
             }
             this.D_OutPut = (String) M2.get("OutPut");
             if(this.D_OutPut == null){
                 this.D_OutPut = "output_dir";
             }
+
+            List Temp01,Temp02;
+            Temp01 = (List) M2.get("FileImport");
+            Temp02 = (List) M2.get("DirImport");
+            if(Temp01 != null){
+                for (int i1 = 0; i1 < Temp01.size(); i1++) {
+                    String Temp03 = (String) Temp01.get(i1);
+                    String Temp03InP1 = Temp03;
+                    String Temp03OutP1 = this.D_OutPut + "/" + Temp03;
+                    FileChannel IC1 = null;
+                    FileChannel OC1 = null;
+                    File TIF1 = new File(Temp03InP1);
+                    if(!TIF1.exists()){
+                        Log.warning("File Error : Input File is not exists In Build Import '" + Temp03 + "' !");
+                        return false;
+                    }
+                    File TOF1 = new File(this.D_OutPut + "/" + Temp03OutP1);
+                    TOF1.mkdirs();
+                    TOF1.delete();
+                    TOF1.createNewFile();
+                    try {
+                        try {
+                            IC1 = new FileInputStream(new File(Temp03InP1)).getChannel();
+                            OC1 = new FileOutputStream(TOF1).getChannel();
+                            OC1.transferFrom(IC1, 0, IC1.size());
+                        } finally {
+                            //IC1.close();
+                            //OC1.close();
+                            if(IC1 != null){
+                                IC1.close();
+                            }
+                            if(OC1 != null){
+                                OC1.close();
+                            }
+                        }
+                    }catch (IOException ex){
+                        Log.warning("File Error : Copy File Failed In Build Import '" + Temp03 + "' !");
+                        ex.printStackTrace();
+                        return false;
+                    }
+
+                }
+            }
+
             D_Name = (String) M1.get("Name");
             D_Icon = (String) M1.get("Icon");
             D_Version = (String) M1.get("Version");
@@ -111,7 +168,10 @@ public class Code {
             //Log.info("Loading Resources Part !");
             M3 = (Map) MP.get("Resources");
             if(M3 == null){
-                Log.info("Resources Part Not Found ! Skip !");
+                M3 = (Map) MP.get("Res");
+            }
+            if(M3 == null){
+                Log.info("Resources Part was Not Found ! Skip !");
             }else{
                 Log.info("Preparing Load Resources Part......");
                 L1 = new ArrayList<>();
@@ -177,15 +237,15 @@ public class Code {
                                         return false;
                                     }
                                     File TOF2 = new File(this.D_OutPut + "/" + OutP2);
-                                    TOF2.mkdirs();
-                                    TOF2.delete();
-                                    TOF2.createNewFile();
+                                    //TOF2.mkdirs();
+                                    //TOF2.delete();
+                                    //TOF2.createNewFile();
                                     try {
                                         /*try {*/
                                             //IC2 = new FileInputStream(new File(InP2)).getChannel();
                                             //OC2 = new FileOutputStream(TOF2).getChannel();
                                             //OC2.transferFrom(IC2, 0, IC2.size());
-                                        CopyFolder(new File(InP2),new File(OutP2));
+                                        CopyFolder(new File(InP2),TOF2);
                                         /*} finally {
                                             IC2.close();
                                             OC2.close();
@@ -267,7 +327,7 @@ public class Code {
                                             return false;
                                         }
                                         File TOF4 = new File(this.D_OutPut + "/" + (String) Tp4.get(j));
-                                        TOF4.mkdirs();
+                                        //TOF4.mkdirs();
                                         //TOF3.delete();
                                         //TOF3.createNewFile();
                                         try {
@@ -279,7 +339,7 @@ public class Code {
                                                 IC4.close();
                                                 OC4.close();
                                             }*/
-                                            CopyFolder(new File((String) Tp3.get(j)),new File( (String) Tp4.get(j)));
+                                            CopyFolder(new File((String) Tp3.get(j)),TOF4);
                                         }catch (IOException ex){
                                             Log.warning("File Error : Copy File Failed In Resources '" + TName + "' !");
                                             ex.printStackTrace();
@@ -318,6 +378,12 @@ public class Code {
                     Log.warning("Error : Can't Find Resources List !");
                     return false;
                 }
+            }
+            M5 = (Map) MP.get("Data");
+            if(M5 == null){
+                Log.info("Data Part was Not Found ! Skip !");
+            }else{
+
             }
 
 

@@ -1,12 +1,14 @@
-Namespace : "testdatapack"
+Namespace2 : "testdatapack"
+NS : "testdatapack"
 Package:
   Icon: "icon.png"
   Name: "%5Test"
   Version: "9"
 Build:
   SubData: "false"
-Resources:
-  DataList: ["t1","t2","t3"]
+#Resources:
+Res:
+  DataList: ["t1","t2","t3","a666"]
   Data:
     t1:
       Type: "File"
@@ -24,6 +26,10 @@ Resources:
       Type: "FileList"
       InList: ["pom.xml","pom.xml"]
       OutList: ["data/c/pom666222.txt","data2/pom666222.txt"]
+    a666:
+      Type: "Dir"
+      In: "data"
+      Out: "data/ds"
 
 
 Test:
