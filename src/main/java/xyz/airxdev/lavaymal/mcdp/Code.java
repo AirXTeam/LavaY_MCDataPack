@@ -15,19 +15,21 @@ import static java.nio.file.StandardCopyOption.*;
 import java.util.logging.Logger;
 
 public class Code {
-    public static String FGF = "\u00a7";
-    public Yaml YL = new Yaml();
-    public String DExpName = "lymd";
-    public String RunDir = "";
-    public String MainFP = "";
-    public Logger Log = Logger.getLogger("MCMP");
-    public String D_SubData = "false";
-    public String D_OutPut = "output_dir";
-    public String D_Icon = "";
-    public byte[] D_IconD ;
-    public String D_Name = "";
-    public String D_Version = "0";
+    protected static String FGF = "\u00a7";
+    protected Yaml YL = new Yaml();
+    protected String DExpName = "lymd";
+    protected String RunDir = "";
+    protected String MainFP = "";
+    protected Logger Log = Logger.getLogger("MCMP");
+    protected String D_SubData = "false";
+    protected String D_OutPut = "output_dir";
+    protected String D_Icon = "";
+    protected byte[] D_IconD ;
+    protected String D_Name = "";
+    protected String D_Version = "0";
     public boolean A_ImportFromOther = false;
+    public boolean A_UseOtherOutPut = false;
+    public String A_UseOtherOutPut_Name = "output_dir";
     public void Init(String RunDir,String MainFP){
         this.RunDir = RunDir;
         this.MainFP = MainFP;
@@ -76,42 +78,53 @@ public class Code {
 
             }
             this.D_OutPut = (String) M2.get("OutPut");
-            if(this.D_OutPut == null){
+            if(A_UseOtherOutPut) {
+                this.D_OutPut = this.A_UseOtherOutPut_Name;
+            }
+            else if(this.D_OutPut == null){
                 this.D_OutPut = "output_dir";
             }
 
             List Temp01,Temp02;
             Temp01 = (List) M2.get("FileImport");
             Temp02 = (List) M2.get("DirImport");
+            Log.info("Importing Build Resources......");
+            if(Temp01 == null){
+                Temp01 = (List) M2.get("ImportFile");
+            }
+            if(Temp02 == null){
+                Temp02 = (List) M2.get("ImportDir");
+            }
             if(Temp01 != null){
+
                 for (int i1 = 0; i1 < Temp01.size(); i1++) {
                     String Temp03 = (String) Temp01.get(i1);
                     String Temp03InP1 = Temp03;
                     String Temp03OutP1 = this.D_OutPut + "/" + Temp03;
-                    FileChannel IC1 = null;
-                    FileChannel OC1 = null;
-                    File TIF1 = new File(Temp03InP1);
-                    if(!TIF1.exists()){
+                    FileChannel Temp03IC1 = null;
+                    FileChannel Temp03OC1 = null;
+                    File Temp03TIF1 = new File(Temp03InP1);
+                    if(!Temp03TIF1.exists()){
                         Log.warning("File Error : Input File is not exists In Build Import '" + Temp03 + "' !");
                         return false;
                     }
-                    File TOF1 = new File(this.D_OutPut + "/" + Temp03OutP1);
-                    TOF1.mkdirs();
-                    TOF1.delete();
-                    TOF1.createNewFile();
+                    File Temp03TOF1 = new File(Temp03OutP1);
+                    Temp03TOF1.mkdirs();
+                    Temp03TOF1.delete();
+                    Temp03TOF1.createNewFile();
                     try {
                         try {
-                            IC1 = new FileInputStream(new File(Temp03InP1)).getChannel();
-                            OC1 = new FileOutputStream(TOF1).getChannel();
-                            OC1.transferFrom(IC1, 0, IC1.size());
+                            Temp03IC1 = new FileInputStream(new File(Temp03InP1)).getChannel();
+                            Temp03OC1 = new FileOutputStream(Temp03TOF1).getChannel();
+                            Temp03OC1.transferFrom(Temp03IC1, 0, Temp03IC1.size());
                         } finally {
                             //IC1.close();
                             //OC1.close();
-                            if(IC1 != null){
-                                IC1.close();
+                            if(Temp03IC1 != null){
+                                Temp03IC1.close();
                             }
-                            if(OC1 != null){
-                                OC1.close();
+                            if(Temp03OC1 != null){
+                                Temp03OC1.close();
                             }
                         }
                     }catch (IOException ex){
@@ -122,6 +135,48 @@ public class Code {
 
                 }
             }
+            if(Temp02 != null){
+                for (int i2 = 0; i2 < Temp02.size(); i2++) {
+                    String Temp04 = (String) Temp02.get(i2);
+                    String Temp04InP1 = Temp04;
+                    String Temp04OutP1 = this.D_OutPut + "/" + Temp04;
+                    /*FileChannel Temp04IC1 = null;
+                    FileChannel Temp04OC1 = null;*/
+                    File Temp04TIF1 = new File(Temp04InP1);
+                    if(!Temp04TIF1.exists()){
+                        Log.warning("File Error : Input Dir is not exists In Build Import '" + Temp04 + "' !");
+                        return false;
+                    }
+                    File Temp04TOF1 = new File(Temp04OutP1);
+                    //TOF1.mkdirs();
+                    //TOF1.delete();
+                    //TOF1.createNewFile();
+                    try {/*
+                        try {
+                            //IC1 = new FileInputStream(new File(Temp04InP1)).getChannel();
+                            //OC1 = new FileOutputStream(TOF1).getChannel();
+                            //OC1.transferFrom(IC1, 0, IC1.size());
+                            CopyFolder(new File(Temp04InP1),Temp04TIF1);
+                        } finally {
+                            //IC1.close();
+                            //OC1.close();
+                            if(Temp04IC1 != null){
+                                Temp04IC1.close();
+                            }
+                            if(Temp04OC1 != null){
+                                Temp04OC1.close();
+                            }
+                        }*/
+                        CopyFolder(Temp04TIF1,Temp04TOF1);
+                    }catch (IOException ex){
+                        Log.warning("File Error : Copy File Failed In Build Import '" + Temp04 + "' !");
+                        ex.printStackTrace();
+                        return false;
+                    }
+
+                }
+            }
+            Log.info("Import Build Resources Finish !");
 
             D_Name = (String) M1.get("Name");
             D_Icon = (String) M1.get("Icon");

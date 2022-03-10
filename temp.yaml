@@ -6,9 +6,12 @@ Package:
   Version: "9"
 Build:
   SubData: "false"
+  FileImport: ["pom.xml"]
+  DirImport: ["data-test"]
+
 #Resources:
 Res:
-  DataList: ["t1","t2","t3","a666"]
+  DataList: ["t1","t2","t3"]
   Data:
     t1:
       Type: "File"
@@ -26,10 +29,6 @@ Res:
       Type: "FileList"
       InList: ["pom.xml","pom.xml"]
       OutList: ["data/c/pom666222.txt","data2/pom666222.txt"]
-    a666:
-      Type: "Dir"
-      In: "data"
-      Out: "data/ds"
 
 
 Test:
