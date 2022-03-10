@@ -20,7 +20,8 @@ public class Code {
     protected String DExpName = "lymd";
     protected String RunDir = "";
     protected String MainFP = "";
-    protected Logger Log = Logger.getLogger("MCMP");
+    public String A_LoggerName = "MCMP";
+    protected Logger Log = Logger.getLogger(this.A_LoggerName);
     protected String D_SubData = "false";
     protected String D_OutPut = "output_dir";
     protected String D_Icon = "";
@@ -68,34 +69,34 @@ public class Code {
             Log.info("NameSpace : " + NameSpace);
             M1 = (Map) MP.get("Package");
             M2 = (Map) MP.get("Build");
-            this.D_SubData = (String) M2.get("SubData");
-            if(this.D_SubData == null){
-                if(this.A_ImportFromOther){
-                    this.D_SubData = "true";
-                }else{
-                    this.D_SubData = "false";
-                }
+            if(M2 != null) {
+                this.D_SubData = (String) M2.get("SubData");
+                /*if (this.D_SubData == null) {
+                    if (this.A_ImportFromOther) {
+                        this.D_SubData = "true";
+                    } else {
+                        this.D_SubData = "false";
+                    }
 
-            }
-            this.D_OutPut = (String) M2.get("OutPut");
-            if(A_UseOtherOutPut) {
-                this.D_OutPut = this.A_UseOtherOutPut_Name;
-            }
-            else if(this.D_OutPut == null){
-                this.D_OutPut = "output_dir";
-            }
+                }*/
+                this.D_OutPut = (String) M2.get("OutPut");
+                /*if (A_UseOtherOutPut) {
+                    this.D_OutPut = this.A_UseOtherOutPut_Name;
+                } else if (this.D_OutPut == null) {
+                    this.D_OutPut = "output_dir";
+                }*/
 
-            List Temp01,Temp02;
-            Temp01 = (List) M2.get("FileImport");
-            Temp02 = (List) M2.get("DirImport");
-            Log.info("Importing Build Resources......");
-            if(Temp01 == null){
+                List Temp01,Temp02;
+                Temp01 = (List) M2.get("FileImport");
+                Temp02 = (List) M2.get("DirImport");
+                Log.info("Importing Build Resources......");
+                if(Temp01 == null){
                 Temp01 = (List) M2.get("ImportFile");
             }
-            if(Temp02 == null){
+                if(Temp02 == null){
                 Temp02 = (List) M2.get("ImportDir");
             }
-            if(Temp01 != null){
+                if(Temp01 != null){
 
                 for (int i1 = 0; i1 < Temp01.size(); i1++) {
                     String Temp03 = (String) Temp01.get(i1);
@@ -135,7 +136,7 @@ public class Code {
 
                 }
             }
-            if(Temp02 != null){
+                if(Temp02 != null){
                 for (int i2 = 0; i2 < Temp02.size(); i2++) {
                     String Temp04 = (String) Temp02.get(i2);
                     String Temp04InP1 = Temp04;
@@ -176,27 +177,51 @@ public class Code {
 
                 }
             }
-            Log.info("Import Build Resources Finish !");
+                Log.info("Import Build Resources Finish !");
+            }
 
-            D_Name = (String) M1.get("Name");
-            D_Icon = (String) M1.get("Icon");
-            D_Version = (String) M1.get("Version");
-            if(Objects.equals(D_SubData, "false")){
-                if(D_Name == null | D_Icon == null){
-                    Log.warning("Package : Invalid File Structure.");
+            if (this.D_SubData == null | M2 == null) {
+                if (this.A_ImportFromOther) {
+                    this.D_SubData = "true";
+                } else {
+                    this.D_SubData = "false";
+                }
+
+            }
+            if (this.A_UseOtherOutPut) {
+                this.D_OutPut = this.A_UseOtherOutPut_Name;
+            } else if (this.D_OutPut == null) {
+                this.D_OutPut = "output_dir";
+            }
+            System.out.println(D_SubData);
+            if(M1 != null){
+                D_Name = (String) M1.get("Name");
+                D_Icon = (String) M1.get("Icon");
+                D_Version = (String) M1.get("Version");
+                if(Objects.equals(D_SubData, "false")){
+                    if(D_Name == null | D_Icon == null){
+                        Log.warning("Package : Invalid File Structure.");
+                        return false;
+                    }
+                }
+            }else{
+                if(Objects.equals(D_SubData, "false")){
+                    Log.warning("Error : Package Part was Not Found !");
                     return false;
                 }
             }
-            Log.info("Reading Icon File.......");
-            File IIF = new File(D_Icon);
-            if(!IIF.exists()){//如果文件不存在
-                Log.warning("Package Error : Icon File '" + IIF.getPath() + "' Nof Found !");
-                return false;
+            if(Objects.equals(D_SubData, "false")) {
+                Log.info("Reading Icon File.......");
+                File IIF = new File(D_Icon);
+                if (!IIF.exists()) {//如果文件不存在
+                    Log.warning("Package Error : Icon File '" + IIF.getPath() + "' Nof Found !");
+                    return false;
+                }
+                InputStream IIS = new FileInputStream(IIF);
+                this.D_IconD = IIS.readAllBytes();
+                Log.info("Read Icon File Finish !");
+                //OUT输出头内容
             }
-            InputStream IIS = new FileInputStream(IIF);
-            this.D_IconD = IIS.readAllBytes();
-            Log.info("Read Icon File Finish !");
-            //OUT输出头内容
             if(Objects.equals(D_SubData, "false")){
                 //为防止出错，检测是否是子文档
                 Log.info("Checking Out Put Dir......");
@@ -315,6 +340,12 @@ public class Code {
                                     List Tp1,Tp2;
                                     Tp1 = (List) TM.get("InList");
                                     Tp2 = (List) TM.get("OutList");
+                                    if(Tp1 == null){
+                                        Tp1 = (List) TM.get("In");
+                                    }
+                                    if(Tp2 == null){
+                                        Tp2 = (List) TM.get("Out");
+                                    }
                                     //String InP3 = (String) TM.get("InList");
                                     //String OutP3 = (String) TM.get("OutList");
                                     FileChannel IC3 = null;
@@ -363,6 +394,12 @@ public class Code {
                                     List Tp3,Tp4;
                                     Tp3 = (List) TM.get("InList");
                                     Tp4 = (List) TM.get("OutList");
+                                    if(Tp3 == null){
+                                        Tp3 = (List) TM.get("In");
+                                    }
+                                    if(Tp4 == null){
+                                        Tp4 = (List) TM.get("Out");
+                                    }
                                     //String InP3 = (String) TM.get("InList");
                                     //String OutP3 = (String) TM.get("OutList");
                                     FileChannel IC4 = null;
@@ -434,14 +471,63 @@ public class Code {
                     return false;
                 }
             }
-            M5 = (Map) MP.get("Data");
-            if(M5 == null){
+
+            M6 = (Map) MP.get("Import");
+            if(M6 == null){
+                Log.info("Import Part was Not Found ! Skip !");
+            }else{
+                Log.info("Loading Import Part......");
+                Temp IPT = new Temp();
+                IPT.L0 = (List) M6.get("FileList");
+                IPT.L1 = (List) M6.get("DirList");
+                if(IPT.L0 == null){
+                    IPT.L0 = (List) M6.get("ListFile");
+                }
+                if(IPT.L1 == null){
+                    IPT.L1 = (List) M6.get("ListDir");
+                }
+                if(IPT.L0 == null){
+                    IPT.L0 = (List) M6.get("File");
+                }
+                if(IPT.L1 == null){
+                    IPT.L1 = (List) M6.get("Dir");
+                }
+                if(IPT.L0 != null){
+                    for (int T2i = 0; T2i < IPT.L0.size(); T2i++) {
+                        IPT.S0 = (String) IPT.L0.get(T2i);
+                        Log.info("Load File : " + IPT.S0);
+                        try{
+                            Code CD = new Code();
+                            CD.Init(this.RunDir, IPT.S0);
+                            CD.A_LoggerName = IPT.S0;
+                            CD.A_UseOtherOutPut = false;
+                            CD.A_UseOtherOutPut_Name = this.A_UseOtherOutPut_Name;
+                            CD.A_ImportFromOther = true;
+                            boolean IsFinish = CD.Load();
+                            if(IsFinish){
+                                Log.info("Load File Finish !");
+                            }else{
+                                Log.info("Load File Failed !");
+                            }
+                        }catch (Exception ex){
+                            Log.warning("System Import Error : At Load File '" + IPT.S0 + "' : ");
+                            ex.printStackTrace();
+                            return false;
+                        }
+
+                    }
+                }
+                if(IPT.M1 != null){
+
+                }
+            }
+
+            M7 = (Map) MP.get("Data");
+            if(M7 == null){
                 Log.info("Data Part was Not Found ! Skip !");
             }else{
 
             }
-
-
 
             return true;
         } catch (IOException e) {
@@ -451,7 +537,7 @@ public class Code {
         }
     }
 
-    private static void CopyFolder(File sourceFolder, File destinationFolder) throws IOException
+    protected static void CopyFolder(File sourceFolder, File destinationFolder) throws IOException
     {
         //Check if sourceFolder is a directory or file
         //If sourceFolder is file; then copy the file directly to new location

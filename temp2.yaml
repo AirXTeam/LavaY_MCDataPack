@@ -1,0 +1,8 @@
+NS : "testdatapack"
+Res:
+  DataList: ["t1"]
+  Data:
+    t1:
+      Type: "File"
+      In: "pom.xml"
+      Out: "pom6996.txt"
