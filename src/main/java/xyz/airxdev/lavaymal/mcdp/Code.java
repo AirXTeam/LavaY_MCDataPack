@@ -1,5 +1,8 @@
 package xyz.airxdev.lavaymal.mcdp;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
@@ -31,6 +34,8 @@ public class Code {
     protected DConfig DC = new DConfig();
     protected JConfig JC = new JConfig();
     protected String NameSpace;
+    protected JSONArray JA = new JSONArray();
+    protected JSON Json = new JSONObject();
     public boolean A_ImportFromOther = false;
     public boolean A_UseOtherOutPut = false;
     public String A_UseOtherOutPut_Name = "output_dir";
@@ -724,55 +729,55 @@ public class Code {
             M7 = (Map) MP.get("Data");
             if(M7 == null){
                 Log.info("Data Part was Not Found ! Skip !");
-            }else{
+            }else {
                 iT2.M0 = (Map) M7.get("Functions");
-                if(iT2.M0 == null){
+                if (iT2.M0 == null) {
                     iT2.M0 = (Map) M7.get("Function");
                 }
-                if(iT2.M0 == null){
+                if (iT2.M0 == null) {
                     iT2.M0 = (Map) M7.get("Func");
                 }
-                if(iT2.M0 != null){
+                if (iT2.M0 != null) {
                     iT2.L0 = new ArrayList();
-                    iT2.S0 = (String) iT2.M0.getOrDefault("AutoList","true");
+                    iT2.S0 = (String) iT2.M0.getOrDefault("AutoList", "true");
                     //iT2.L1 = (List) iT2.M0.get("DataList");
                     iT2.M1 = (Map) iT2.M0.get("Data");
-                    if(iT2.M1 != null) {
+                    if (iT2.M1 != null) {
                         if (iT2.S0 == "true") {
                             iT2.L0 = List.of(iT2.M1.keySet().toArray());
-                        }else{
+                        } else {
                             iT2.L0 = (List) iT2.M0.get("DataList");
                         }
                         //L1 = List.of(M5.keySet().toArray());
                     }
 
-                    if(iT2.L0 != null){
-                        if(iT2.M1 != null) {
+                    if (iT2.L0 != null) {
+                        if (iT2.M1 != null) {
                             for (int i600 = 0; i600 < iT2.L0.size(); i600++) {
                                 String FName600 = (String) iT2.L0.get(i600);
                                 iT2.M10 = (Map) iT2.M1.get(FName600);
-                                if(iT2.M10 != null){
-                                    iT2.S11 = (String) iT2.M10.getOrDefault("Type","String");
+                                if (iT2.M10 != null) {
+                                    iT2.S11 = (String) iT2.M10.getOrDefault("Type", "String");
                                     //iT2.S12 = (List) iT2.M10.get("Data"); //文件模式，是路径
                                     //iT2.L11 = (List) iT2.M10.get("Data"); //文本模式，是数组
                                     iT2.S9 = (String) iT2.M10.get("Name");
                                     String OTP = FName600;
                                     String AOTP = "";
-                                    if(iT2.S9 != null){
+                                    if (iT2.S9 != null) {
                                         OTP = iT2.S9;
                                     }
-                                    AOTP = DC.FunctionPath.replaceAll("#OD#",this.D_OutPut);
-                                    AOTP = AOTP.replaceAll("#NS#",this.NameSpace);
-                                    AOTP = AOTP.replaceAll("#FN#",OTP);//旧的不推荐用的方式：iT2.F1 = new File(this.D_OutPut + "/" + "data");
-                                    if(iT2.S11.equals("String")){
+                                    AOTP = DC.FunctionPath.replaceAll("#OD#", this.D_OutPut);
+                                    AOTP = AOTP.replaceAll("#NS#", this.NameSpace);
+                                    AOTP = AOTP.replaceAll("#FN#", OTP);//旧的不推荐用的方式：iT2.F1 = new File(this.D_OutPut + "/" + "data");
+                                    if (iT2.S11.equals("String")) {
                                         iT2.L11 = (List) iT2.M10.get("Data");
-                                        if(iT2.L11 != null){
+                                        if (iT2.L11 != null) {
                                             String AA2 = "";
                                             iT2.F2 = new File(AOTP);
                                             for (int i = 0; i < iT2.L11.size(); i++) {
                                                 AA2 = AA2 + iT2.L11.get(i) + "\n";
                                             }
-                                            if(iT2.F2.exists()){
+                                            if (iT2.F2.exists()) {
                                                 Log.warning("File : '" + iT2.F2.getPath() + "' is exists ! OverWrite !");
                                                 iT2.F2.delete();
                                             }
@@ -782,16 +787,16 @@ public class Code {
                                             iT2.OS0 = new FileOutputStream(iT2.F2);
                                             iT2.OS0.write(AA2.getBytes());
                                         }
-                                    }else if(iT2.S11.equals("File")){
+                                    } else if (iT2.S11.equals("File")) {
                                         iT2.S12 = (String) iT2.M10.get("Data");
-                                        if(iT2.S12 != null){
+                                        if (iT2.S12 != null) {
                                             iT2.F0 = new File(iT2.S12);
                                             iT2.F1 = new File(AOTP);
-                                            if(!iT2.F0.exists()){
+                                            if (!iT2.F0.exists()) {
                                                 Log.warning("File Error : '" + iT2.F0.getPath() + "' was Not Found !");
                                                 return false;
                                             }
-                                            if(iT2.F1.exists()){
+                                            if (iT2.F1.exists()) {
                                                 Log.warning("File : '" + iT2.F1.getPath() + "' is exists ! OverWrite !");
                                                 iT2.F1.delete();
                                             }
@@ -803,7 +808,7 @@ public class Code {
                                             byte[] BT01 = iT2.IS3.readAllBytes();
                                             iT2.OS4.write(BT01);
                                         }
-                                    }else if(iT2.S11.equals("FileList")) {
+                                    } else if (iT2.S11.equals("FileList")) {
                                         iT2.L13 = (List) iT2.M10.get("Data");
                                         if (iT2.L13 != null) {
                                             /*iT2.F20 = new File(iT2.S13);*/
@@ -844,7 +849,7 @@ public class Code {
 
                             }
                         }
-                    }else{
+                    } else {
                         Log.warning("Error : Can't Find Function List !");
                         return false;
                     }
@@ -852,7 +857,68 @@ public class Code {
 
                 }
 
-                iT3.M0 = (Map) M7.get("Functions");
+
+                /*
+                iT3.M0 = (Map) M7.get("Advancements");
+                if(iT3.M0 == null){
+                    iT3.M0 = (Map) M7.get("Advancement");
+                }
+                if(iT3.M0 == null){
+                    iT3.M0 = (Map) M7.get("Advan");
+                }
+                if(iT3.M0 != null){
+                    iT3.L0 = new ArrayList();
+                    iT3.S0 = (String) iT3.M0.getOrDefault("AutoList","true");
+                    //iT2.L1 = (List) iT2.M0.get("DataList");
+                    iT3.M1 = (Map) iT3.M0.get("Data");
+                    if(iT3.M1 != null) {
+                        if (iT3.S0 == "true") {
+                            iT3.L0 = List.of(iT3.M1.keySet().toArray());
+                        }else{
+                            iT3.L0 = (List) iT3.M0.get("DataList");
+                        }
+                        //L1 = List.of(M5.keySet().toArray());
+                    }
+
+                    if(iT3.L0 != null){
+                        if(iT3.M1 != null) {
+                            for (int i600 = 0; i600 < iT3.L0.size(); i600++) {
+                                String FName600 = (String) iT3.L0.get(i600);
+                                iT3.M10 = (Map) iT3.M1.get(FName600);
+                                if(iT3.M10 != null){
+                                    iT2.S9 = (String) iT2.M10.get("Name");
+                                    String OTP = FName600;
+                                    String AOTP = "";
+                                    if(iT2.S9 != null){
+                                        OTP = iT2.S9;
+                                    }
+                                    AOTP = DC.AdvancementsPath.replaceAll("#OD#",this.D_OutPut);
+                                    AOTP = AOTP.replaceAll("#NS#",this.NameSpace);
+                                    AOTP = AOTP.replaceAll("#FN#",OTP);
+                                    iT3.L11 = (List) iT3.M10.get("Data");
+                                    if(iT3.L11 != null){
+                                        iT3.F2 = new File(AOTP);
+                                        if(iT3.F2.exists()){
+                                            Log.warning("File : '" + iT3.F2.getPath() + "' is exists ! OverWrite !");
+                                            iT3.F2.delete();
+                                        }
+                                        iT3.F2.mkdirs();
+                                        iT3.F2.delete();
+                                        iT3.F2.createNewFile();
+                                        iT3.OS0 = new FileOutputStream(iT3.F2);
+                                        iT3.OS0.write({});
+
+                                    }
+                                }
+
+                            }
+                        }
+                    }else{
+                        Log.warning("Error : Can't Find Function List !");
+                        return false;
+                    }
+                }*/
+
 
             }
 

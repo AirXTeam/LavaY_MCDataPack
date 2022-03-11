@@ -9,30 +9,9 @@ Build:
   FileImport: ["pom.xml"]
   DirImport: ["data-test"]
 
-#Resources:
-Res:
-  DataList: ["t1","t2","t3"]
-  Data:
-    t1:
-      Type: "File"
-      In: "pom.xml"
-      Out: "pom666.txt"
-    t2:
-      Type: "File"
-      In: "pom.xml"
-      Out: "data/c/pom666222.txt"
-    t5555:
-      Type: "File"
-      In: "pom.xml"
-      Out: "data/c/pom666222.txt"
-    t3:
-      Type: "FileList"
-      InList: [ "pom.xml","pom.xml" ]
-      OutList: [ "data/c/pom666222.txt","data2/pom666222.txt" ]
-
 Import:
   #FileList: ["temp2.yaml"]
-  DirList: ["!lydp-test"]
+  #DirList: ["lydp-test"]
 
 
 Data:
@@ -57,9 +36,5 @@ Data:
           "pom.xml",
           "pom.xml"
         ]
+  Advancements:
 
-
-
-Test:
-  T2: ["as",
-  "bs"]
