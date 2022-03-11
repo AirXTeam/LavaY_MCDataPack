@@ -31,7 +31,9 @@ Res:
       OutList: [ "data/c/pom666222.txt","data2/pom666222.txt" ]
 
 Import:
-  FileList: ["temp2.yaml"]
+  #FileList: ["temp2.yaml"]
+  DirList: ["!lydp-test"]
+
 
 Data:
   Functions:

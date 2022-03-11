@@ -29,6 +29,7 @@ public class Code {
     protected String D_Name = "";
     protected String D_Version = "0";
     protected DConfig DC = new DConfig();
+    protected JConfig JC = new JConfig();
     protected String NameSpace;
     public boolean A_ImportFromOther = false;
     public boolean A_UseOtherOutPut = false;
@@ -539,17 +540,175 @@ public class Code {
                         IPT.S1 = (String) IPT.L1.get(T3i);
                         Log.info("Load File : " + IPT.S1);
                         try{
-                            Code CD = new Code();
-                            CD.Init(this.RunDir, IPT.S1);
-                            CD.A_LoggerName = IPT.S1;
-                            CD.A_UseOtherOutPut = false;
-                            CD.A_UseOtherOutPut_Name = this.A_UseOtherOutPut_Name;
-                            CD.A_ImportFromOther = true;
-                            boolean IsFinish = CD.Load();
-                            if(IsFinish){
-                                Log.info("Load File Finish !");
-                            }else{
-                                Log.info("Load File Failed !");
+                            FileList FL = new FileList();
+                            FL.A_EndsWith = this.DExpName;
+                            /*File Ifd = new File(IPT.S1);*/
+                            File Ifd;
+                            /*if(!Ifd.isDirectory()){
+                                Log.warning("Import Error : A Directory != A File : '" + IPT.S1 + "' !");
+                                return false;
+                            }*/
+                            char[] head = IPT.S1.toCharArray();
+                            if(head.length >= 1) {
+                                if (head[0] == '*') {
+                                    IPT.S30 = "";
+                                    for (int i = 1; i < head.length; i++) {
+                                        IPT.S30 = IPT.S30 + head[i];
+                                    }
+                                    File Ifd2 = new File(IPT.S30);
+                                    File[] Fls = Ifd2.listFiles(FL);
+                                    for (int i = 0; i < Fls.length; i++) {
+                                        Code CD = new Code();
+                                        CD.Init(this.RunDir, Fls[i].getPath());
+                                        CD.A_LoggerName = Fls[i].getPath();
+                                        CD.A_UseOtherOutPut = false;
+                                        CD.A_UseOtherOutPut_Name = this.A_UseOtherOutPut_Name;
+                                        CD.A_ImportFromOther = true;
+                                        boolean IsFinish = CD.Load();
+                                        if (IsFinish) {
+                                            Log.info("Load File Finish !");
+                                        } else {
+                                            Log.info("Load File Failed !");
+                                        }
+                                    }
+
+
+                                }else if (head[0] == '#') {
+                                    IPT.S30 = "";
+                                    for (int i = 1; i < head.length; i++) {
+                                        IPT.S30 = IPT.S30 + head[i];
+                                    }
+                                    File Ifd3 = new File(IPT.S30);
+                                    //File[] Fls = Ifd2.listFiles(FL);
+                                    List N = new ArrayList<>();
+                                    Tools.FindFileListWithEName(Ifd3, N, this.DExpName);
+                                    for (int i = 0; i < N.size(); i++) {
+                                        File NF = new File((String) N.get(i));
+                                        Code CD = new Code();
+                                        CD.Init(this.RunDir, NF.getPath());
+                                        CD.A_LoggerName = NF.getPath();
+                                        CD.A_UseOtherOutPut = false;
+                                        CD.A_UseOtherOutPut_Name = this.A_UseOtherOutPut_Name;
+                                        CD.A_ImportFromOther = true;
+                                        boolean IsFinish = CD.Load();
+                                        if (IsFinish) {
+                                            Log.info("Load File Finish !");
+                                        } else {
+                                            Log.info("Load File Failed !");
+                                        }
+                                    }
+                                } else if (head[0] == '$') {
+                                    IPT.S30 = "";
+                                    for (int i = 1; i < head.length; i++) {
+                                        IPT.S30 = IPT.S30 + head[i];
+                                    }
+                                    File Ifd3 = new File(IPT.S30);
+                                    //File[] Fls = Ifd2.listFiles(FL);
+                                    List N = new ArrayList<>();
+                                    Tools.FindFileListWithEName(Ifd3, N, this.DExpName);
+                                    for (int i = 0; i < N.size(); i++) {
+                                        File NF = new File((String) N.get(i));
+                                        Code CD = new Code();
+                                        CD.Init(this.RunDir, NF.getPath());
+                                        CD.A_LoggerName = NF.getPath();
+                                        CD.A_UseOtherOutPut = false;
+                                        CD.A_UseOtherOutPut_Name = this.A_UseOtherOutPut_Name;
+                                        CD.A_ImportFromOther = true;
+                                        boolean IsFinish = CD.Load();
+                                        if (IsFinish) {
+                                            Log.info("Load File Finish !");
+                                        } else {
+                                            Log.info("Load File Failed !");
+                                        }
+                                    }
+                                }else if (head[0] == '~') {
+                                    IPT.S30 = "";
+                                    for (int i = 1; i < head.length; i++) {
+                                        IPT.S30 = IPT.S30 + head[i];
+                                    }
+                                    File Ifd2 = new File(IPT.S30);
+                                    File[] Fls = Ifd2.listFiles(FL);
+                                    for (int i = 0; i < Fls.length; i++) {
+                                        Code CD = new Code();
+                                        CD.Init(this.RunDir, Fls[i].getPath());
+                                        CD.A_LoggerName = Fls[i].getPath();
+                                        CD.A_UseOtherOutPut = false;
+                                        CD.A_UseOtherOutPut_Name = this.A_UseOtherOutPut_Name;
+                                        CD.A_ImportFromOther = true;
+                                        boolean IsFinish = CD.Load();
+                                        if (IsFinish) {
+                                            Log.info("Load File Finish !");
+                                        } else {
+                                            Log.info("Load File Failed !");
+                                        }
+                                    }
+                                }else if (head[0] == '@') {
+                                    IPT.S30 = "";
+                                    for (int i = 1; i < head.length; i++) {
+                                        IPT.S30 = IPT.S30 + head[i];
+                                    }
+                                    File Ifd30 = new File(IPT.S30);
+                                    //File[] Fls = Ifd2.listFiles(FL);
+                                    List N = new ArrayList<>();
+                                    Tools.FindFileListWithEName(Ifd30, N, "");
+                                    for (int i = 0; i < N.size(); i++) {
+                                        File NF = new File((String) N.get(i));
+                                        Code CD = new Code();
+                                        CD.Init(this.RunDir, NF.getPath());
+                                        CD.A_LoggerName = NF.getPath();
+                                        CD.A_UseOtherOutPut = false;
+                                        CD.A_UseOtherOutPut_Name = this.A_UseOtherOutPut_Name;
+                                        CD.A_ImportFromOther = true;
+                                        boolean IsFinish = CD.Load();
+                                        if (IsFinish) {
+                                            Log.info("Load File Finish !");
+                                        } else {
+                                            Log.info("Load File Failed !");
+                                        }
+                                    }
+                                }else if (head[0] == '!'){
+                                    IPT.S30 = "";
+                                    for (int i = 1; i < head.length; i++) {
+                                        IPT.S30 = IPT.S30 + head[i];
+                                    }
+
+                                    File Ifd9 = new File(IPT.S30);
+                                    File[] Fls = Ifd9.listFiles();
+                                    for (int i = 0; i < Fls.length; i++) {
+                                        Code CD = new Code();
+                                        CD.Init(this.RunDir, Fls[i].getPath());
+                                        CD.A_LoggerName = Fls[i].getPath();
+                                        CD.A_UseOtherOutPut = false;
+                                        CD.A_UseOtherOutPut_Name = this.A_UseOtherOutPut_Name;
+                                        CD.A_ImportFromOther = true;
+                                        boolean IsFinish = CD.Load();
+                                        if (IsFinish) {
+                                            Log.info("Load File Finish !");
+                                        } else {
+                                            Log.info("Load File Failed !");
+                                        }
+                                    }
+                                }
+                            /*else{
+                                    File Ifd4 = new File(IPT.S1);
+                                    File[] Fls = Ifd4.listFiles(FL);
+                                    for (int i = 0; i < Fls.length; i++) {
+                                        Code CD = new Code();
+                                        CD.Init(this.RunDir, Fls[i].getPath());
+                                        CD.A_LoggerName = Fls[i].getPath();
+                                        CD.A_UseOtherOutPut = false;
+                                        CD.A_UseOtherOutPut_Name = this.A_UseOtherOutPut_Name;
+                                        CD.A_ImportFromOther = true;
+                                        boolean IsFinish = CD.Load();
+                                        if (IsFinish) {
+                                            Log.info("Load File Finish !");
+                                        } else {
+                                            Log.info("Load File Failed !");
+                                        }
+                                    }
+                                }*/
+
+
                             }
                         }catch (Exception ex){
                             Log.warning("System Import Error : At Load File '" + IPT.S1 + "' : ");
@@ -561,6 +720,7 @@ public class Code {
                 }
             }
             Temp iT2 = new Temp();
+            Temp iT3 = new Temp();
             M7 = (Map) MP.get("Data");
             if(M7 == null){
                 Log.info("Data Part was Not Found ! Skip !");
@@ -692,7 +852,7 @@ public class Code {
 
                 }
 
-
+                iT3.M0 = (Map) M7.get("Functions");
 
             }
 
