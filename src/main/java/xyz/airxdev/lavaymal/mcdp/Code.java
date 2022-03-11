@@ -28,6 +28,8 @@ public class Code {
     protected byte[] D_IconD ;
     protected String D_Name = "";
     protected String D_Version = "0";
+    protected DConfig DC = new DConfig();
+    protected String NameSpace;
     public boolean A_ImportFromOther = false;
     public boolean A_UseOtherOutPut = false;
     public String A_UseOtherOutPut_Name = "output_dir";
@@ -58,15 +60,16 @@ public class Code {
                 return false;
             }
             Map MP = (Map)OB;//转换到Map类型
-            String NameSpace = (String) MP.get("Namespace");
-            if(NameSpace == null){
-                NameSpace = (String) MP.get("NS");
-                if(NameSpace == null){
+            //String NameSpace = (String) MP.get("Namespace");
+            this.NameSpace = (String) MP.get("Namespace");
+            if(this.NameSpace == null){
+                this.NameSpace = (String) MP.get("NS");
+                if(this.NameSpace == null){
                     Log.warning("NameSpace Error : NameSpace was Nof Found !");
                     return false;
                 }
             }
-            Log.info("NameSpace : " + NameSpace);
+            Log.info("NameSpace : " + this.NameSpace);
             M1 = (Map) MP.get("Package");
             M2 = (Map) MP.get("Build");
             if(M2 != null) {
@@ -193,7 +196,7 @@ public class Code {
             } else if (this.D_OutPut == null) {
                 this.D_OutPut = "output_dir";
             }
-            System.out.println(D_SubData);
+            //System.out.println(D_SubData);
             if(M1 != null){
                 D_Name = (String) M1.get("Name");
                 D_Icon = (String) M1.get("Icon");
@@ -255,8 +258,22 @@ public class Code {
             }else{
                 Log.info("Preparing Load Resources Part......");
                 L1 = new ArrayList<>();
-                L1 = (List) M3.get("DataList");
+                String TsAt = (String) M3.get("AutoList");
                 M5 = (Map) M3.get("Data");
+                if(M5 != null) {
+                    if (TsAt == null) {
+                        //System.out.println(M5.keySet());
+                        L1 = List.of(M5.keySet().toArray());
+
+                    } else {
+                        if (TsAt.equals("true")) {
+                            List.of(M5.keySet().toArray());
+                        }
+                        L1 = (List) M3.get("DataList");
+                    }
+                }
+                //L1 = (List) M3.get("DataList");
+                //M5 = (Map) M3.get("Data");
                 if(L1 != null){
                     Log.info("Loading Resources Part......");
                     for (int i = 0; i < L1.size(); i++) {
@@ -517,15 +534,165 @@ public class Code {
 
                     }
                 }
-                if(IPT.M1 != null){
+                if(IPT.L1 != null){
+                    for (int T3i = 0; T3i < IPT.L1.size(); T3i++) {
+                        IPT.S1 = (String) IPT.L1.get(T3i);
+                        Log.info("Load File : " + IPT.S1);
+                        try{
+                            Code CD = new Code();
+                            CD.Init(this.RunDir, IPT.S1);
+                            CD.A_LoggerName = IPT.S1;
+                            CD.A_UseOtherOutPut = false;
+                            CD.A_UseOtherOutPut_Name = this.A_UseOtherOutPut_Name;
+                            CD.A_ImportFromOther = true;
+                            boolean IsFinish = CD.Load();
+                            if(IsFinish){
+                                Log.info("Load File Finish !");
+                            }else{
+                                Log.info("Load File Failed !");
+                            }
+                        }catch (Exception ex){
+                            Log.warning("System Import Error : At Load File '" + IPT.S1 + "' : ");
+                            ex.printStackTrace();
+                            return false;
+                        }
 
+                    }
                 }
             }
-
+            Temp iT2 = new Temp();
             M7 = (Map) MP.get("Data");
             if(M7 == null){
                 Log.info("Data Part was Not Found ! Skip !");
             }else{
+                iT2.M0 = (Map) M7.get("Functions");
+                if(iT2.M0 == null){
+                    iT2.M0 = (Map) M7.get("Function");
+                }
+                if(iT2.M0 == null){
+                    iT2.M0 = (Map) M7.get("Func");
+                }
+                if(iT2.M0 != null){
+                    iT2.L0 = new ArrayList();
+                    iT2.S0 = (String) iT2.M0.getOrDefault("AutoList","true");
+                    //iT2.L1 = (List) iT2.M0.get("DataList");
+                    iT2.M1 = (Map) iT2.M0.get("Data");
+                    if(iT2.M1 != null) {
+                        if (iT2.S0 == "true") {
+                            iT2.L0 = List.of(iT2.M1.keySet().toArray());
+                        }else{
+                            iT2.L0 = (List) iT2.M0.get("DataList");
+                        }
+                        //L1 = List.of(M5.keySet().toArray());
+                    }
+
+                    if(iT2.L0 != null){
+                        if(iT2.M1 != null) {
+                            for (int i600 = 0; i600 < iT2.L0.size(); i600++) {
+                                String FName600 = (String) iT2.L0.get(i600);
+                                iT2.M10 = (Map) iT2.M1.get(FName600);
+                                if(iT2.M10 != null){
+                                    iT2.S11 = (String) iT2.M10.getOrDefault("Type","String");
+                                    //iT2.S12 = (List) iT2.M10.get("Data"); //文件模式，是路径
+                                    //iT2.L11 = (List) iT2.M10.get("Data"); //文本模式，是数组
+                                    iT2.S9 = (String) iT2.M10.get("Name");
+                                    String OTP = FName600;
+                                    String AOTP = "";
+                                    if(iT2.S9 != null){
+                                        OTP = iT2.S9;
+                                    }
+                                    AOTP = DC.FunctionPath.replaceAll("#OD#",this.D_OutPut);
+                                    AOTP = AOTP.replaceAll("#NS#",this.NameSpace);
+                                    AOTP = AOTP.replaceAll("#FN#",OTP);//旧的不推荐用的方式：iT2.F1 = new File(this.D_OutPut + "/" + "data");
+                                    if(iT2.S11.equals("String")){
+                                        iT2.L11 = (List) iT2.M10.get("Data");
+                                        if(iT2.L11 != null){
+                                            String AA2 = "";
+                                            iT2.F2 = new File(AOTP);
+                                            for (int i = 0; i < iT2.L11.size(); i++) {
+                                                AA2 = AA2 + iT2.L11.get(i) + "\n";
+                                            }
+                                            if(iT2.F2.exists()){
+                                                Log.warning("File : '" + iT2.F2.getPath() + "' is exists ! OverWrite !");
+                                                iT2.F2.delete();
+                                            }
+                                            iT2.F2.mkdirs();
+                                            iT2.F2.delete();
+                                            iT2.F2.createNewFile();
+                                            iT2.OS0 = new FileOutputStream(iT2.F2);
+                                            iT2.OS0.write(AA2.getBytes());
+                                        }
+                                    }else if(iT2.S11.equals("File")){
+                                        iT2.S12 = (String) iT2.M10.get("Data");
+                                        if(iT2.S12 != null){
+                                            iT2.F0 = new File(iT2.S12);
+                                            iT2.F1 = new File(AOTP);
+                                            if(!iT2.F0.exists()){
+                                                Log.warning("File Error : '" + iT2.F0.getPath() + "' was Not Found !");
+                                                return false;
+                                            }
+                                            if(iT2.F1.exists()){
+                                                Log.warning("File : '" + iT2.F1.getPath() + "' is exists ! OverWrite !");
+                                                iT2.F1.delete();
+                                            }
+                                            iT2.F1.mkdirs();
+                                            iT2.F1.delete();
+                                            iT2.F1.createNewFile();
+                                            iT2.IS3 = new FileInputStream(iT2.F0);
+                                            iT2.OS4 = new FileOutputStream(iT2.F1);
+                                            byte[] BT01 = iT2.IS3.readAllBytes();
+                                            iT2.OS4.write(BT01);
+                                        }
+                                    }else if(iT2.S11.equals("FileList")) {
+                                        iT2.L13 = (List) iT2.M10.get("Data");
+                                        if (iT2.L13 != null) {
+                                            /*iT2.F20 = new File(iT2.S13);*/
+                                            iT2.F21 = new File(AOTP);
+                                        /*if(iT2.F20.exists()){
+                                            Log.warning("File Error : '" + iT2.F20.getPath() + "' was Not Found !");
+                                            return false;
+                                        }*/
+                                            byte[] ABT02 = {};
+                                            for (int i = 0; i < iT2.L13.size(); i++) {
+                                                iT2.F20 = new File((String) iT2.L13.get(i));
+                                                if (!iT2.F20.exists()) {
+                                                    Log.warning("File Error : '" + iT2.F20.getPath() + "' was Not Found !");
+                                                    return false;
+                                                }
+                                                iT2.IS23 = new FileInputStream(iT2.F20);
+                                                byte[] A2 = iT2.IS23.readAllBytes();
+                                                ABT02 = Tools.CBytes(ABT02, "\n".getBytes());
+                                                ABT02 = Tools.CBytes(ABT02, A2);
+
+                                            }
+                                            if (iT2.F21.exists()) {
+                                                Log.warning("File : '" + iT2.F21.getPath() + "' is exists ! OverWrite !");
+                                                iT2.F21.delete();
+                                            }
+                                            iT2.F21.mkdirs();
+                                            iT2.F21.delete();
+                                            iT2.F21.createNewFile();
+
+
+                                            //iT2.IS23 = new FileInputStream(iT2.F20);
+                                            iT2.OS24 = new FileOutputStream(iT2.F21);
+                                            //byte[] BT01 = iT2.IS23.readAllBytes();
+                                            iT2.OS24.write(ABT02);
+                                        }
+                                    }
+                                }
+
+                            }
+                        }
+                    }else{
+                        Log.warning("Error : Can't Find Function List !");
+                        return false;
+                    }
+
+
+                }
+
+
 
             }
 

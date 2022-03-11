@@ -27,11 +27,36 @@ Res:
       Out: "data/c/pom666222.txt"
     t3:
       Type: "FileList"
-      InList: ["pom.xml","pom.xml"]
-      OutList: ["data/c/pom666222.txt","data2/pom666222.txt"]
+      InList: [ "pom.xml","pom.xml" ]
+      OutList: [ "data/c/pom666222.txt","data2/pom666222.txt" ]
 
 Import:
   FileList: ["temp2.yaml"]
+
+Data:
+  Functions:
+    #AutoList: "false"
+    #DataList: ["testfunc1"]
+    Data:
+      testfunc1:
+        #Type: "String"
+        #Name: "test/t2"
+        Data: [
+                "say hi!this is a demo",
+                "kill @e"
+        ]
+      test222:
+        Type: "File"
+        Data: "pom.xml"
+      test6666:
+        Type: "FileList"
+        #Name: "te5/4"
+        Data: [
+          "pom.xml",
+          "pom.xml"
+        ]
+
+
 
 Test:
   T2: ["as",
